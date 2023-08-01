@@ -1,16 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
+<meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Agenda de Contactos</title>
-</head>
-<style>
+  <style>
     body {
       background-color: black;
       color: white;
       font-family: Arial, sans-serif;
+    }
+
+    .contact-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
     }
 
     ul {
@@ -18,12 +23,27 @@
       padding: 0;
     }
 
-    li {
+
+    .contact-group {
+      border-bottom: 1px solid white;
       margin-bottom: 10px;
-      font-size: 20px;
     }
 
-    a {
+    .contact-group-title {
+      font-size: 24px;
+      margin: 10px 0;
+    }
+
+    .contact {
+      margin-bottom: 5px;
+    }
+
+    .add-contact {
+      display: block;
+      margin-top: 20px;
+    }
+
+    .add-contact a {
       display: inline-block;
       background-color: white;
       color: black;
@@ -33,21 +53,49 @@
       margin-top: 10px;
     }
 
-    a:hover {
+    .add-contact a:hover {
       background-color: #f2f2f2;
       color: black;
     }
-
-    h1 {
-  font-family: 'Courier New', monospace;
-}
   </style>
+</head>
 <body>
   <h1>Agenda de Contactos</h1>
-  <a href="/add">Agregar nuevo contacto</a>
-  <ul>
-    <% contacts.forEach(contact => { %>
-      <li><%= contact.nombre %> <%= contact.apellido %> - <%= contact.telefono %></li>
+  <div class="add-contact">
+    <a href="/add">Agregar nuevo contacto</a>
+  </div>
+  <ul class="contact-list">
+    <% 
+      function groupContactsByInitial(contacts) {
+        const groupedContacts = {};
+
+        contacts.forEach(contact => {
+          const initial = contact.nombre.charAt(0).toUpperCase();
+          if (initial.match(/[ABCDEFGHIJKLMNÑOPQRSTUVWXYZ]/)) {
+            groupedContacts[initial] = groupedContacts[initial] || [];
+            groupedContacts[initial].push(contact);
+          } else {
+            groupedContacts['Otros'] = groupedContacts['Otros'] || [];
+            groupedContacts['Otros'].push(contact);
+          }
+        });
+
+        return groupedContacts;
+      }
+
+      const groupedContacts = groupContactsByInitial(contacts);
+
+      Object.keys(groupedContacts).forEach(initial => {
+        const contacts = groupedContacts[initial];
+    %>
+    <li class="contact-group">
+      <h2 class="contact-group-title"><%= initial %></h2>
+      <ul>
+        <% contacts.forEach(contact => { %>
+          <li class="contact"><%= contact.nombre %> <%= contact.apellido %> - <%= contact.telefono %></li>
+        <% }); %>
+      </ul>
+    </li>
     <% }); %>
   </ul>
 </body>
